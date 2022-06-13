@@ -89,10 +89,8 @@ resized_img = imutils.resize(img, width=1000)
 
 gray = cv2.cvtColor(resized_img, cv2.COLOR_BGR2GRAY)
 _, threshold = cv2.threshold(gray, 230, 255, cv2.THRESH_BINARY)
-#cv2.imshow('Test', threshold)
 
 contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-#print(contours)
 
 images = ['Ha', 'HaHa', 'LMAO', 'XD']
 ID = {}
@@ -110,9 +108,9 @@ aruco_color = {}
 for i in range(1, 5):
     aruco_color[colors_name[i-1]] = ID[i]
 
-
 rgb = np.ones((resized_img.shape[1],resized_img.shape[0],3))*255
 new_img = cv2.resize(rgb, (resized_img.shape[1],resized_img.shape[0]))
+
 
 c = []
 flag = 0
@@ -149,7 +147,7 @@ for con in contours:
             except ZeroDivisionError:
                 theta = - math.pi/2
 
-            ar = cv2.imread('images\\' + images[flag] + '.jpg')
+            ar = cv2.imread('images\\' + aruco_color[color_name] + '.jpg')
             center1, theta1 = angle(ar)
                 
             r = rotate_image(ar, theta1-(theta*180/math.pi), center1)
