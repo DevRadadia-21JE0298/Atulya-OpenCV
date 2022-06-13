@@ -115,6 +115,7 @@ rgb = np.ones((resized_img.shape[1],resized_img.shape[0],3))*255
 new_img = cv2.resize(rgb, (resized_img.shape[1],resized_img.shape[0]))
 
 c = []
+flag = 0
 for con in contours:
     perimeter = cv2.arcLength(con, True)
     approx = cv2.approxPolyDP(con, 0.01 * perimeter, True)
@@ -124,8 +125,6 @@ for con in contours:
         ar = float(h)/w
 
         if ar >= 0.95 and ar <= 1.05:
-            
-            
             coordinates = [c[0].tolist() for c in approx]
             center_cord_x = (coordinates[0][0] + coordinates[2][0])//2
             center_cord_y = (coordinates[0][1] + coordinates[2][1])//2
@@ -150,17 +149,18 @@ for con in contours:
             except ZeroDivisionError:
                 theta = - math.pi/2
 
-            for image in images:
-                ar = cv2.imread('images\\' + image + '.jpg')
-                center1, theta1 = angle(ar)
+            ar = cv2.imread('images\\' + images[flag] + '.jpg')
+            center1, theta1 = angle(ar)
                 
-                r = rotate_image(ar, theta1-(theta*180/math.pi), center1)
-                c_r = crop(r)
+            r = rotate_image(ar, theta1-(theta*180/math.pi), center1)
+            c_r = crop(r)
                 
-                s = cv2.resize(c_r, padded_shape)
-                new_img[(y_min+15):(y_max-15), (x_min+15):(x_max-15), :] = s
+            s = cv2.resize(c_r, padded_shape)
+            new_img[(y_min+15):(y_max-15), (x_min+15):(x_max-15), :] = s
 
             c.append(con)
+
+            flag += 1
 
 
 for con in contours[1:]:
@@ -179,23 +179,11 @@ for con in contours[1:]:
         x_min, y_min, x_max, y_max = extreme_cords(coordinates)
         
         if len(approx) > 6:
-            to1 = resized_img[y_min:y_max, (x_min-10):(x_max+10)]
-            shape1 = to1.shape
-            sw = shape1[0]
-            se = shape1[1]
-            
-            newshape = (se,sw)
-            to1 = cv2.resize(to1,newshape)
-            new_img[y_min:(y_max),(x_min-10):(x_max+10),:]=to1
+            s = resized_img[y_min:y_max, (x_min-10):(x_max+10)]
+            new_img[y_min:y_max, (x_min-10):(x_max+10), :] = s
         else:
-            to1 = resized_img[y_min:y_max, (x_min):(x_max)]
-            shape1 = to1.shape
-            sw = shape1[0]
-            se = shape1[1]
-            
-            newshape = (se,sw)
-            to1 = cv2.resize(to1,newshape)
-            new_img[y_min:(y_max), x_min:(x_max),:]=to1
+            s = resized_img[y_min:y_max, (x_min):(x_max)]
+            new_img[y_min:y_max, x_min:x_max, :] = s
 
 
 cv2.drawContours(new_img, c, -1, (255,0,0), 3)
